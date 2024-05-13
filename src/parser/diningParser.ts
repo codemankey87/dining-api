@@ -98,7 +98,9 @@ export default class DiningParser {
       builder.setCoordinates(new Coordinate(lat, lng));
     }
 
-    const timeBuilder = new TimeBuilder();
+// TODO: Implement additional edge case handling as outlined in the wiki.
+// This is a placeholder for the actual logic that needs to be added.
+const timeBuilder = new TimeBuilder();
     const nextSevenDays = $("ul.schedule").find("li").toArray();
     const addedSchedules = new Set();
 
