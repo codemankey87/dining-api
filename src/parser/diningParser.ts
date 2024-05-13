@@ -142,16 +142,36 @@ export default class DiningParser {
         for (const timeSlot of timeSlots) {
           const [start, end] = timeSlot.split("-").map(time => time.trim());
 
-          if (prevSlot && start === prevSlot.start) {
-            // If the current time slot has the same opening time as the previous one
-            // Update the previous slot with the later closing time
-            if (end > prevSlot.end) {
-              prevSlot.end = end;
+          if (prevSlot) {
+            const prevEnd = prevSlot.end;
+            const currentStart = start;
+            const currentEnd = end;
+
+            // Check if current time slot is contained within the previous one
+            if (currentStart >= prevSlot.start && currentEnd <= prevEnd) {
+              // Current slot is contained within the previous one, do not add it
+              continue;
+            }
+
+            // Check if current time slot overlaps with the previous one
+            if (currentStart <= prevEnd) {
+              // Update the previous slot with the earliest start time and latest end time
+              prevSlot.start = prevSlot.start < currentStart ? prevSlot.start : currentStart;
+              prevSlot.end = prevEnd > currentEnd ? prevEnd : currentEnd;
+            } else {
+              // No overlap, push the previous slot and set the current slot as previous
+              mergedTimeSlots.push(prevSlot);
+              prevSlot = { start, end };
             }
           } else {
-            mergedTimeSlots.push({ start, end });
+            // First slot, set as previous
             prevSlot = { start, end };
           }
+        }
+        // Push the last slot
+        if (prevSlot) {
+          mergedTimeSlots.push(prevSlot);
+        }
         }
 
         // Format and add merged time slots
